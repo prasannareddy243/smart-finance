@@ -390,19 +390,14 @@ const SettingsPanel = ({ settings, setSettings }) => {
                         <small style={{ color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>This UPI ID will be embedded in every QR code with the exact due amount.</small>
                     </div>
                     <div className="form-group full-width">
-                        <label>Upload Backup Shop QR Code (Optional)</label>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                            Upload your PhonePe/GooglePay business QR as a fallback.
-                        </p>
-                        <div className="file-upload-wrapper">
-                            <input type="file" accept="image/*" onChange={handleQrUpload} />
-                        </div>
-                        {settings.storeQrCode && (
-                            <div style={{ marginTop: '1.5rem', background: 'white', padding: '15px', display: 'inline-block', borderRadius: '12px', textAlign: 'center' }}>
-                                <p style={{ color: 'black', marginBottom: '10px', fontWeight: 'bold' }}>Active QR:</p>
-                                <img src={settings.storeQrCode} alt="Store QR" style={{ width: '150px', height: '150px', objectFit: 'contain' }} />
-                            </div>
-                        )}
+                        <label>WhatsApp Backend URL (Ngrok)</label>
+                        <input
+                            type="text"
+                            value={settings.backendUrl || ''}
+                            onChange={e => setSettings({ ...settings, backendUrl: e.target.value })}
+                            placeholder="e.g. https://your-name.ngrok-free.app"
+                        />
+                        <small style={{ color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>Set this to your Ngrok URL to enable WhatsApp alerts from your hosted dashboard.</small>
                     </div>
                 </div>
             </div>
@@ -454,7 +449,8 @@ const CustomerCard = ({ record, settings, onPay, onShowQR, onShowLedger, onDelet
                 setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
             }
 
-            const response = await fetch('http://localhost:5000/send-reminder', {
+            const backendBase = settings.backendUrl || 'http://localhost:5000';
+            const response = await fetch(`${backendBase}/send-reminder`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phone, message: msg, amount: amt, upiId })
@@ -1301,7 +1297,7 @@ const App = () => {
     });
     const [settings, setSettings] = useState(() => {
         const saved = localStorage.getItem('smartFinanceSettingsV1');
-        return saved ? JSON.parse(saved) : { storeQrCode: null, upiId: '' };
+        return saved ? JSON.parse(saved) : { storeQrCode: null, upiId: '', backendUrl: 'http://localhost:5000' };
     });
 
     const [toast, setToast] = useState({ show: false, message: '' });
