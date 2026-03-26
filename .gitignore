@@ -1,0 +1,7 @@
+*.db
+temp_qr.png
+PyWhatKit_DB.txt
+__pycache__/
+.vscode/
+.idea/
+node_modules/
